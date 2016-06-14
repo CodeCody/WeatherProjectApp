@@ -11,6 +11,7 @@ import android.graphics.ColorFilter;
 import android.graphics.drawable.Drawable;
 import android.location.*;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -67,11 +68,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private boolean currentFlag = false;
     private GoogleApiClient GoogleClient;
     private ListView listView;
-    private android.location.Location location;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private Button edit_loc;
-    private LinearLayout current_loc_container;
     private static String locationPref="LocationOption";
     public static boolean geo_flag=true;
     private boolean wifi_flag=false;
@@ -92,9 +91,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         viewPager = (ViewPager) findViewById(R.id.viewPager);
 
-        viewPager.setOffscreenPageLimit(2);
-        viewPager.setPageMarginDrawable(R.drawable.margin_drawable);
-        viewPager.setPageMargin(10);
+        if(viewPager!=null) {
+            viewPager.setOffscreenPageLimit(2);
+            viewPager.setPageMarginDrawable(R.drawable.margin_drawable);
+            viewPager.setPageMargin(10);
+        }
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         navigationView = (NavigationView) findViewById(R.id.navigationView);
 
@@ -152,8 +153,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
         adapter.setLocations(readLocationsFromFile());
-
-        if(wifi_flag && geo_flag) {
+        ConnectivityManager manager=(ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo info=manager.getActiveNetworkInfo();
+        if(wifi_flag && geo_flag && info.isConnected()) {
             GoogleClient.connect();
         }
         else if(geo_flag)
@@ -161,9 +163,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             wifiReceiver=new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-                    if (info != null && info.isConnected()) {
-                        Toast.makeText(MainActivity.this, "Wifi Enabled. Connecting...", Toast.LENGTH_SHORT).show();
+                    final NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                    if (info != null && info.isConnectedOrConnecting()) {
+                        Toast.makeText(MainActivity.this, "Wifi Enabled. Trying to connect...", Toast.LENGTH_SHORT).show();
+
                         GoogleClient.connect();
                     }
                 }
@@ -198,13 +201,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             currentLocation.setVisibility(View.VISIBLE);
         }
     }
+
     public void checkWifi()
     {
       WifiManager wifiManager=(WifiManager)getSystemService(Context.WIFI_SERVICE);
+        ConnectivityManager connectivityManager=(ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
         if(wifiManager.isWifiEnabled())
         {
             wifi_flag=true;
-            return;
         }
         else
         {
@@ -236,8 +241,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         };
         alertDialog.setNegativeButton("NO",choice);
         alertDialog.setPositiveButton("YES",choice);
-
-
 
         alertDialog.create().show();
     }
@@ -350,8 +353,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         viewPager.setCurrentItem(pos);
     }
 
-
-
     @Override
     protected void onStart()
     {
@@ -363,8 +364,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             manager.beginTransaction().add(R.id.drawer,new EditLocationFragment()).addToBackStack(null).commit();
         }
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -398,13 +397,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onConnectionFailed(ConnectionResult result)
     {
-      getSupportFragmentManager().beginTransaction().replace(R.id.drawer,new NoConnectionFragment()).commit();
+      //getSupportFragmentManager().beginTransaction().replace(R.id.drawer,new NoConnectionFragment()).commit();
+        Log.i("onConnectionFailed",result.getErrorMessage());
     }
 
     @Override
     public void onConnectionSuspended(int code)
     {
-
+        Log.i("onConnectionSuspended",String.valueOf(code));
     }
 
     @Override

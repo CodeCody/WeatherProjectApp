@@ -53,39 +53,28 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 /**
- * Created by codyhammond on 4/7/16.
+ @author codyhammond
  */
 public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeListener,UpdateUI
 {
     public final static String baseURL="https://query.yahooapis.com/v1/public";
-    public StringBuilder statement=new StringBuilder();
     public String URL="select location,item,lastBuildDate,astronomy from weather.forecast where woeid in (select woeid from geo.places(1) where text=\"%s\")";
     public final static String ending="&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
     private TextView currentStatus;
     private TextView tmp;
     private TextView location,SunriseText,SunsetText,Forecast_Label;
     private ImageView imageStatus;
-    private Condition information;
-    private Location loc;
-    private Hashtable<String,Integer>day_weather_image;
-    private Hashtable<String,Integer>night_weather_image;
     private RecyclerView recyclerView,recyclerView2;
     private ScrollView scrollView;
-    private DrawerLayout drawerLayout;
     private DrawerListener drawerListener;
     private Button ten_day;
     private ProgressBar progressBar;
-    private Button edit_loc;
     private Button five_day;
-
     private ImageButton addForecast;
     private ImageButton navForecast;
     private String city;
     private ForecastAdapter adapter1 = new ForecastAdapter();
     private ForecastAdapter adapter2 = new ForecastAdapter();
-
-    private NavigationView navigationView;
-
     private WeatherRetriever weatherRetriever;
 
 
@@ -106,26 +95,22 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
 
         final View view = inflater.inflate(R.layout.weather_display, parent, false);
 
-            city = getArguments().getString("info");
-            weatherRetriever.setLocation(city);
-            weatherRetriever.setQuery(URL);
-
+        city = getArguments().getString("info");
+        weatherRetriever.setLocation(city);
+        weatherRetriever.setQuery(URL);
 
         SunriseText = (TextView) view.findViewById(R.id.sunrise_time);
         SunsetText = (TextView) view.findViewById(R.id.sunset_time);
         Forecast_Label=(TextView)view.findViewById(R.id.forecast_label);
         scrollView = (ScrollView) view.findViewById(R.id.scrollView);
-        edit_loc = (Button) view.findViewById(R.id.edit_loc);
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
-        drawerLayout = (DrawerLayout) view.findViewById(R.id.drawer);
-        //listView = (ListView) view.findViewById(R.id.listview);
-        navigationView = (NavigationView) view.findViewById(R.id.navigationView);
         currentStatus = (TextView) view.findViewById(R.id.condition_textview);
         tmp = (TextView) view.findViewById(R.id.temp_textview);
         imageStatus = (ImageView) view.findViewById(R.id.weather_imageview);
         location = (TextView) view.findViewById(R.id.city_name);
         ten_day = (Button) view.findViewById(R.id.ten_day);
         five_day = (Button) view.findViewById(R.id.five_day);
+
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false) {
             @Override
@@ -142,12 +127,6 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         });
 
         recyclerView2.setVisibility(View.GONE);
-        WeatherAdapter weatherAdapter = ((MainActivity) getActivity()).getWeather();
-
-
-
-        //recyclerView2.setAlpha(0f);
-        //recyclerView2.setTranslationY(-500);
 
         five_day.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,6 +136,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
                 recyclerView2.setVisibility(View.GONE);
             }
         });
+
         ten_day.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -165,9 +145,6 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
                 five_day.setTextColor(Color.parseColor("#AFAFAF"));
             }
         });
-
-
-
 
         addForecast = (ImageButton) view.findViewById(R.id.imagebutton);
         navForecast = (ImageButton) view.findViewById(R.id.nav);
@@ -183,7 +160,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         navForecast.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //drawerLayout.openDrawer(navigationView);
+
                 drawerListener.openDrawer();
             }
         });
@@ -201,17 +178,12 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
             weatherRetriever.connect();
 
         }
-        catch (NullPointerException NPE)
+        catch (NullPointerException | IllegalStateException exception)
         {
-            Log.e("Exception",NPE.getMessage());
-        }
-        catch (IllegalStateException ISE)
-        {
-            Log.e("Exception",ISE.getMessage());
+            Log.e("weatherRtrver.connect()",exception.getMessage());
         }
 
     }
-
 
     @Override
     public void onPause()
@@ -219,7 +191,6 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         super.onPause();
         Log.i("Called","Pause");
     }
-
 
     @Override
     public void onHiddenChanged(boolean hidden)
@@ -348,8 +319,10 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         public void bindForecast(Forecast forecast)
         {
             char degree=(char)0x00B0;
-            high.setText(forecast.high+degree);
-            low.setText(forecast.low+degree);
+            String highforecast=forecast.high+degree;
+            String lowforecast=forecast.low+degree;
+            high.setText(highforecast);
+            low.setText(lowforecast);
             day.setText(forecast.day);
 
             String w=forecast.text;
