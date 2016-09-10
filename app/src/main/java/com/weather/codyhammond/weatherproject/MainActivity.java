@@ -1,46 +1,36 @@
-package com.example.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherproject;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.drawable.Drawable;
+import android.content.pm.PackageManager;
 import android.location.*;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.SharedPreferencesCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.JsonReader;
 import android.util.JsonWriter;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,9 +43,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -95,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             viewPager.setOffscreenPageLimit(2);
             viewPager.setPageMarginDrawable(R.drawable.margin_drawable);
             viewPager.setPageMargin(10);
+
         }
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         navigationView = (NavigationView) findViewById(R.id.navigationView);
@@ -153,6 +142,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
         adapter.setLocations(readLocationsFromFile());
+
+        CurrentLocLabelOnOrOff();
+
+    }
+
+    public ViewPager getViewPager() {
+        return viewPager;
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        googleClientConnect();
+    }
+
+    public void googleClientConnect()
+    {
         ConnectivityManager manager=(ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo info=manager.getActiveNetworkInfo();
         if(wifi_flag && geo_flag && info.isConnected()) {
@@ -180,14 +187,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             viewPager.setAdapter(adapter);
         }
 
-        CurrentLocLabelOnOrOff();
-
     }
-
-    public ViewPager getViewPager() {
-        return viewPager;
-    }
-
     public void CurrentLocLabelOnOrOff()
     {
         if(!geo_flag)
@@ -390,9 +390,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private void startLocationUpdates()
     {
-        LocationRequest locationRequest=LocationRequest.create().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(3000);
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                GoogleClient, locationRequest, this);
+        if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED)
+        {
+            LocationRequest locationRequest=LocationRequest.create().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(3000);
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    GoogleClient, locationRequest, this);
+        }
+
     }
     @Override
     public void onConnectionFailed(ConnectionResult result)
@@ -425,25 +429,32 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                // viewPager.addView(new WeatherCurrentFragment().getView(),0);
 
             }
-        } catch (Exception e) {
-
-            builder.append(R.string.current_location_not_available);
-            Log.e("onLocationChanged",e.getMessage());
-            e.printStackTrace();
-//d            getSupportFragmentManager().beginTransaction().add(R.id.activity_main,new SearchFragment()).commit();
-        }
-        finally {
-
-            viewPager.removeAllViews();
-            adapter.setCurrentLocation(builder.toString());
-
-            viewPager.setAdapter(adapter);
-
             if(GoogleClient.isConnected()) {
                 GoogleClient.unregisterConnectionCallbacks(this);
                 removeLocationUpdates();
                 GoogleClient.disconnect();
             }
+        } catch (Exception e) {
+
+            builder.append(R.string.current_location_not_available);
+            viewPager.removeAllViews();
+            Log.e("onLocationChanged",e.getMessage());
+            e.printStackTrace();
+
+//d            getSupportFragmentManager().beginTransaction().add(R.id.activity_main,new SearchFragment()).commit();
+        }
+        finally {
+
+
+            adapter.setCurrentLocation(builder.toString());
+
+            viewPager.setAdapter(adapter);
+
+         /*   if(GoogleClient.isConnected()) {
+                GoogleClient.unregisterConnectionCallbacks(this);
+                removeLocationUpdates();
+                GoogleClient.disconnect(); */
+          //  }
         }
     }
 

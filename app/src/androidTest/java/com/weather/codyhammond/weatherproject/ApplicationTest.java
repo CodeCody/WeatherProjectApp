@@ -1,4 +1,4 @@
-package com.example.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherproject;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

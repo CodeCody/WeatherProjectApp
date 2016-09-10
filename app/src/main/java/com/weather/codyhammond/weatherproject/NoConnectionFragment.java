@@ -1,4 +1,4 @@
-package com.example.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherproject;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

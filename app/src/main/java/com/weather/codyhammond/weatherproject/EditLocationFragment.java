@@ -1,24 +1,20 @@
-package com.example.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherproject;
 
 import android.database.DataSetObserver;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.MainThread;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -179,7 +175,13 @@ public class EditLocationFragment extends Fragment
     public void onStop()
     {
         super.onStop();
-        adapter.unregisterDataSetObserver(dataSetObserver);
+        try {
+            adapter.unregisterDataSetObserver(dataSetObserver);
+        }
+        catch (IllegalStateException ISE)
+        {
+            Log.e("onStop",ISE.getMessage());
+        }
     }
 
     public void selectionCheck()

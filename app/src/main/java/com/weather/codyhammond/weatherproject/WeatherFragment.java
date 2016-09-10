@@ -1,56 +1,33 @@
-package com.example.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherproject;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import retrofit.Callback;
-import retrofit.ResponseCallback;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 /**
  @author codyhammond
@@ -72,10 +49,13 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
     private Button five_day;
     private ImageButton addForecast;
     private ImageButton navForecast;
+    private ImageView background_image;
     private String city;
     private ForecastAdapter adapter1 = new ForecastAdapter();
     private ForecastAdapter adapter2 = new ForecastAdapter();
     private WeatherRetriever weatherRetriever;
+    private Animation background_animation;
+
 
 
     @Override
@@ -85,6 +65,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         setRetainInstance(true);
         weatherRetriever=new WeatherRetriever();
         weatherRetriever.setFragmentUIListener(this);
+        background_animation=AnimationUtils.loadAnimation(getContext(),R.anim.background_image_fade);
         ((MainActivity) getActivity()).getViewPager().addOnPageChangeListener(this);
         drawerListener=(MainActivity)getActivity();
     }
@@ -103,6 +84,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         SunsetText = (TextView) view.findViewById(R.id.sunset_time);
         Forecast_Label=(TextView)view.findViewById(R.id.forecast_label);
         scrollView = (ScrollView) view.findViewById(R.id.scrollView);
+        background_image=(ImageView)view.findViewById(R.id.background_image);
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         currentStatus = (TextView) view.findViewById(R.id.condition_textview);
         tmp = (TextView) view.findViewById(R.id.temp_textview);
@@ -166,6 +148,8 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         });
 
         hideViews();
+
+
        return view;
     }
 
@@ -176,7 +160,6 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         try
         {
             weatherRetriever.connect();
-
         }
         catch (NullPointerException | IllegalStateException exception)
         {
@@ -192,6 +175,12 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         Log.i("Called","Pause");
     }
 
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+
+    }
     @Override
     public void onHiddenChanged(boolean hidden)
     {
@@ -251,6 +240,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         recyclerView.setVisibility(View.GONE);
         recyclerView2.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
+       // background_image.setVisibility(View.GONE);
     }
 
     public void showViews()
@@ -263,6 +253,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         scrollView.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
+
     }
 
     @Override
@@ -294,6 +285,8 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         adapter2.setForecastArrayList(weatherRetriever.getTenDayForecast());
         recyclerView2.setAdapter(adapter2);
         progressBar.setVisibility(View.GONE);
+        background_image.setImageResource(weatherRetriever.getWeatherBackground());
+        background_image.startAnimation(background_animation);
     }
 
     public void closeDrawer()

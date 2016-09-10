@@ -1,14 +1,9 @@
-package com.example.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherproject;
 
 import android.app.Activity;
-import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.util.LongSparseArray;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,13 +11,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+
+
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by codyhammond on 4/20/16.
@@ -95,10 +88,12 @@ public class WeatherAdapter extends FragmentStatePagerAdapter {
     {
         locations.remove(position);
         locationAdapter.notifyDataSetChanged();
+
         if(MainActivity.geo_flag)
         fragmentList.remove(position+1);
         else
         fragmentList.remove(position);
+
         removalAdapter.notifyDataSetChanged();
         notifyDataSetChanged();
     }

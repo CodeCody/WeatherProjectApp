@@ -1,11 +1,7 @@
-package com.example.codyhammond.weatherproject;
-
-import android.telecom.Call;
+package com.weather.codyhammond.weatherproject;
 
 import retrofit.Callback;
-import retrofit.http.EncodedPath;
 import retrofit.http.GET;
-import retrofit.http.Path;
 import retrofit.http.Query;
 
 /**

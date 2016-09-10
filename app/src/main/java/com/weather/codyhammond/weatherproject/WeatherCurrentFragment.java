@@ -1,4 +1,4 @@
-package com.example.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherproject;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,8 +8,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
@@ -17,13 +15,13 @@ import android.widget.TextView;
  */
 public class WeatherCurrentFragment extends WeatherFragment {
 
-    @Override
+    @Override @SuppressWarnings("NewApi")
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState)
     {
         View view=super.onCreateView(inflater,parent,savedInstanceState);
         TextView city_name=(TextView)view.findViewById(R.id.city_name);
         Bitmap bitmap= BitmapFactory.decodeResource(getResources(),R.drawable.ic_near_me_white_24dp);
-        Drawable drawable=new BitmapDrawable(getResources(),bitmap);
+        Drawable drawable=new BitmapDrawable(getResources(),bitmap.createScaledBitmap(bitmap,70,70,false));
         city_name.setCompoundDrawablesWithIntrinsicBounds(drawable,null,null,null);
 
         return view;

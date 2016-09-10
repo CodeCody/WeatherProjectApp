@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/weather_page"
+
     android:layout_centerHorizontal="true">
     <ProgressBar
         android:layout_width="match_parent"
@@ -11,6 +13,16 @@
         android:id="@+id/progressBar"
         android:layout_gravity="center_vertical|center_horizontal"/>
 
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/background_image"
+            android:scaleType="fitXY"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,12 +32,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
         android:layout_weight="2">
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_menu"
+            android:layout_width="35dp"
+            android:paddingLeft="5dp"
+            android:layout_height="40dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/weather_menu"
             android:id="@+id/nav"
             android:background="@android:color/transparent"/>
 
@@ -34,6 +49,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
         android:layout_weight="1"
         android:gravity="end">
         <ImageButton
@@ -51,6 +67,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="@android:color/transparent"
         android:gravity="center_horizontal">
 
     <TextView
@@ -58,6 +75,9 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="-"
+        android:maxWidth="300dp"
+        android:ellipsize="end"
+        style="@style/AudioFileInfoOverlayText"
         android:id="@+id/city_name"
         android:layout_gravity="center_horizontal"
         android:textSize="30dp" />
@@ -75,6 +95,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="-"
         android:id="@+id/condition_textview"
+        style="@style/AudioFileInfoOverlayText"
         android:textColor="@android:color/white"
         android:layout_gravity="center_horizontal"
         />
@@ -84,6 +105,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="-"
+        style="@style/AudioFileInfoOverlayText"
         android:id="@+id/temp_textview"
         android:layout_gravity="center_horizontal"
         android:textSize="30sp" />
@@ -94,6 +116,7 @@
             android:paddingStart="5dp"
             android:paddingLeft="5dp"
             android:text="Forecast"
+            android:background="@color/background_opaque"
             android:id="@+id/forecast_label"
             android:textColor="#ffffff"
             android:textSize="20sp" />
@@ -101,6 +124,7 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/background_opaque"
             android:id="@+id/scrollView">
 
             <include layout="@layout/forcast_listing"></include>
@@ -109,4 +133,5 @@
 
     </LinearLayout>
 
+    </FrameLayout>
 </LinearLayout>

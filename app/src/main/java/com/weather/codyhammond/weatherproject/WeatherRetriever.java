@@ -1,9 +1,9 @@
-package com.example.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherproject;
 
 import android.net.Uri;
 import android.util.Log;
 
-import java.net.URI;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -27,6 +27,7 @@ public class WeatherRetriever
     private UpdateUI FragmentUI=null;
     private String weather_status,sunset,sunrise,query,weather_location,weather_condition,location;
     private Integer weather_id= 0;
+    private Integer background_image_id=0;
     private final char degree=(char)0x00b0;
 
     private WeatherInterface weatherInterface;
@@ -58,14 +59,15 @@ public class WeatherRetriever
         if(weather_location==null)
         {
             Log.i("WeatherRtrvr.connect()","weather_location==null");
+
         }
         if(query.length()==0)
         {
             throw new IllegalStateException("No query set,call WeatherRetriever.setQuery(String)");
         }
-        if(weather_location.length()==0)
+        if(weather_location==null || weather_location.length()==0)
         {
-            throw new IllegalStateException("No location set,call WeatherRetriever.setLocation(String)");
+            throw new IllegalStateException("No location set");
         }
         if(FragmentUI==null)
         {
@@ -100,10 +102,17 @@ public class WeatherRetriever
     {
         return weather_condition;
     }
+
     public Integer getWeatherImage()
     {
        return weather_id;
     }
+
+    public Integer getWeatherBackground()
+    {
+        return background_image_id;
+    }
+
     public List<Forecast> getFiveDayForecast()
     {
         return five_day_list;
@@ -220,6 +229,7 @@ public class WeatherRetriever
         @Override
         public void success(WeatherJSON json, Response response)
         {
+
             try {
                 Location location_json = json.query.results.channel.location;
                 Condition condition = json.query.results.channel.item.condition;
@@ -242,13 +252,18 @@ public class WeatherRetriever
                 RiseMatcher = timePattern.matcher(sunrise);
                 final boolean isDay = daylight(Currentmatcher, SetMatcher, RiseMatcher);
 
+
                 weather_condition = condition.text;
                 temperatureBuilder.append(condition.temp).append(degree);
                 temperature=temperatureBuilder.toString();
                 if (isDay && WeatherImageCenter.day_weather_image.get(weather_condition) != null) {
                     weather_id = WeatherImageCenter.day_weather_image.get(weather_condition);
+                    background_image_id=WeatherImageCenter.day_background_image.get(weather_id);
                 } else if (!isDay && WeatherImageCenter.night_weather_image.get(condition.text) != null) {
                     weather_id = WeatherImageCenter.night_weather_image.get(weather_condition);
+                    background_image_id=WeatherImageCenter.night_background_image.get(weather_id);
+                    if(background_image_id==null)
+                        background_image_id=0;
                 } else {
                     weather_id = R.drawable.na;
                 }
@@ -256,7 +271,7 @@ public class WeatherRetriever
             }
             catch (NullPointerException NPE)
             {
-                Log.e("MyCallBack.success()",NPE.getMessage());
+                Log.e("MyCallBack",NPE.getMessage());
                 FragmentUI.updateUIOnFailure();
             }
 
@@ -265,7 +280,7 @@ public class WeatherRetriever
         @Override
         public void failure(RetrofitError retrofitError)
         {
-            Log.i("Failure",retrofitError.getMessage());
+            Log.i("RetroFit Failure",retrofitError.getMessage());
             FragmentUI.updateUIOnFailure();
         }
     }
