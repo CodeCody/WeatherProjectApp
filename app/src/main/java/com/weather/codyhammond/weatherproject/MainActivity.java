@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     {
         ConnectivityManager manager=(ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo info=manager.getActiveNetworkInfo();
-        if(wifi_flag && geo_flag && info.isConnected()) {
+        if(wifi_flag && geo_flag && info !=null) {
             GoogleClient.connect();
         }
         else if(geo_flag)
@@ -175,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         Toast.makeText(MainActivity.this, "Wifi Enabled. Trying to connect...", Toast.LENGTH_SHORT).show();
 
                         GoogleClient.connect();
+                        unregisterReceiver(wifiReceiver);
                     }
                 }
             };
@@ -357,7 +358,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     protected void onStart()
     {
         super.onStart();
-
         if(adapter.getCount()==0 && !geo_flag)
         {
             FragmentManager manager=getSupportFragmentManager();
@@ -377,6 +377,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     {
         super.onDestroy();
         sharedPreferences=getPreferences(MODE_PRIVATE);
+     //   unregisterReceiver(wifiReceiver);
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putBoolean(locationPref,geo_flag).apply();
         writeLocationsToFile();
@@ -440,21 +441,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             viewPager.removeAllViews();
             Log.e("onLocationChanged",e.getMessage());
             e.printStackTrace();
+            if(GoogleClient.isConnected()) {
+                GoogleClient.unregisterConnectionCallbacks(this);
+                removeLocationUpdates();
+                GoogleClient.disconnect();
+            }
 
 //d            getSupportFragmentManager().beginTransaction().add(R.id.activity_main,new SearchFragment()).commit();
         }
         finally {
-
-
             adapter.setCurrentLocation(builder.toString());
-
             viewPager.setAdapter(adapter);
-
-         /*   if(GoogleClient.isConnected()) {
-                GoogleClient.unregisterConnectionCallbacks(this);
-                removeLocationUpdates();
-                GoogleClient.disconnect(); */
-          //  }
         }
     }
 

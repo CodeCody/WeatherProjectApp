@@ -229,12 +229,22 @@ public class WeatherRetriever
         @Override
         public void success(WeatherJSON json, Response response)
         {
+            Location location_json;
+            Condition condition;
+            Astronomy astronomy;
+            Item item;
 
             try {
-                Location location_json = json.query.results.channel.location;
-                Condition condition = json.query.results.channel.item.condition;
-                Astronomy astronomy = json.query.results.channel.astronomy;
-                Item item = json.query.results.channel.item;
+                 location_json = json.query.results.channel.location;
+                 condition = json.query.results.channel.item.condition;
+                 astronomy = json.query.results.channel.astronomy;
+                 item = json.query.results.channel.item;
+            }
+            catch (NullPointerException NPE) {
+                  Log.e("GSON null value",NPE.getMessage());
+                FragmentUI.updateUIOnFailure();
+                return;
+            }
                 StringBuilder locationBuilder=new StringBuilder(),temperatureBuilder=new StringBuilder();
 
                 locationBuilder.append(location_json.city).append(", ").append(location_json.region);
@@ -252,13 +262,16 @@ public class WeatherRetriever
                 RiseMatcher = timePattern.matcher(sunrise);
                 final boolean isDay = daylight(Currentmatcher, SetMatcher, RiseMatcher);
 
-
+                try
+                {
                 weather_condition = condition.text;
                 temperatureBuilder.append(condition.temp).append(degree);
                 temperature=temperatureBuilder.toString();
                 if (isDay && WeatherImageCenter.day_weather_image.get(weather_condition) != null) {
                     weather_id = WeatherImageCenter.day_weather_image.get(weather_condition);
                     background_image_id=WeatherImageCenter.day_background_image.get(weather_id);
+                    if(background_image_id==null)
+                        background_image_id=0;
                 } else if (!isDay && WeatherImageCenter.night_weather_image.get(condition.text) != null) {
                     weather_id = WeatherImageCenter.night_weather_image.get(weather_condition);
                     background_image_id=WeatherImageCenter.night_background_image.get(weather_id);
@@ -271,7 +284,7 @@ public class WeatherRetriever
             }
             catch (NullPointerException NPE)
             {
-                Log.e("MyCallBack",NPE.getMessage());
+                Log.e("getting values",NPE.getMessage());
                 FragmentUI.updateUIOnFailure();
             }
 

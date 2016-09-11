@@ -33,10 +33,13 @@ import java.util.Hashtable;
         day_weather_image.put("Windy",R.drawable.breezy);
         day_weather_image.put("Rain And Snow",R.drawable.rain_snow_mix);
         day_weather_image.put("Snow Showers",R.drawable.snow);
+        day_weather_image.put("Scattered Snow Showers",R.drawable.snow);
 
 
         day_background_image.put(R.drawable.sunny,R.drawable.sunny_bkg_converted);
         day_background_image.put(R.drawable.partly_cloudy,R.drawable.partly_cloudy_background);
+        day_background_image.put(R.drawable.mostly_cloudy,R.drawable.partly_cloudy_background);
+        day_background_image.put(R.drawable.cloudy,R.drawable.partly_cloudy_background);
         day_background_image.put(R.drawable.scattered_thunderstorms,R.drawable.storm_background);
         day_background_image.put(R.drawable.scattered_rain,R.drawable.storm_background);
         day_background_image.put(R.drawable.showers,R.drawable.rain_background);
@@ -48,8 +51,10 @@ import java.util.Hashtable;
         day_background_image.put(R.drawable.snow,R.drawable.day_snow_background);
 
 
+
         night_background_image.put(R.drawable.clear_night,R.drawable.clear_night_background);
         night_background_image.put(R.drawable.cloudy,R.drawable.cloudy_night_background);
+        night_background_image.put(R.drawable.mostly_cloudy_night,R.drawable.partly_cloudy_night_background);
         night_background_image.put(R.drawable.partly_cloudy_night,R.drawable.partly_cloudy_night_background);
         night_background_image.put(R.drawable.mostly_clear_night,R.drawable.cloudy_night_background);
         night_background_image.put(R.drawable.mostly_cloudy_night,R.drawable.cloudy_night_background);
@@ -81,6 +86,7 @@ import java.util.Hashtable;
         night_weather_image.put("na",R.drawable.na);
         night_weather_image.put("Showers",R.drawable.showers);
         night_weather_image.put("Snow Showers",R.drawable.snow);
+        night_weather_image.put("Scattered Snow Showers",R.drawable.snow);
         night_weather_image.put("Breezy",R.drawable.breezy);
     }
 }
