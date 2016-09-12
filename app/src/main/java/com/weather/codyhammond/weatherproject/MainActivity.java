@@ -14,6 +14,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -155,17 +156,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     protected void onResume()
     {
         super.onResume();
-        googleClientConnect();
+        establishConnection();
     }
 
-    public void googleClientConnect()
+    public void establishConnection()
     {
         ConnectivityManager manager=(ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo info=manager.getActiveNetworkInfo();
         if(wifi_flag && geo_flag && info !=null) {
             GoogleClient.connect();
         }
-        else if(geo_flag)
+        else if(geo_flag || !wifi_flag)
         {
             wifiReceiver=new BroadcastReceiver() {
                 @Override
@@ -174,14 +175,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     if (info != null && info.isConnectedOrConnecting()) {
                         Toast.makeText(MainActivity.this, "Wifi Enabled. Trying to connect...", Toast.LENGTH_SHORT).show();
 
-                        GoogleClient.connect();
+                        if(geo_flag) {
+                            GoogleClient.connect();
+                        }
+
                         unregisterReceiver(wifiReceiver);
                     }
                 }
             };
 
-            IntentFilter intentFilter=new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-            registerReceiver(wifiReceiver,intentFilter);
+
         }
         else
         {
@@ -400,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     }
     @Override
-    public void onConnectionFailed(ConnectionResult result)
+    public void onConnectionFailed(@NonNull ConnectionResult result)
     {
       //getSupportFragmentManager().beginTransaction().replace(R.id.drawer,new NoConnectionFragment()).commit();
         Log.i("onConnectionFailed",result.getErrorMessage());

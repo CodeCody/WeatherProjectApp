@@ -1,10 +1,16 @@
 package com.weather.codyhammond.weatherproject;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -24,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import java.util.ArrayList;
@@ -51,10 +58,31 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
     private ImageButton navForecast;
     private ImageView background_image;
     private String city;
+    private ImageButton refreshButton;
     private ForecastAdapter adapter1 = new ForecastAdapter();
     private ForecastAdapter adapter2 = new ForecastAdapter();
     private WeatherRetriever weatherRetriever;
     private Animation background_animation;
+    private BroadcastReceiver wifiReceiver=new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+            if (info != null && info.isConnectedOrConnecting()) {
+                Toast.makeText(getActivity(), "Wifi Enabled. Trying to connect...", Toast.LENGTH_SHORT).show();
+                try {
+                    weatherRetriever.connect();
+                }
+                catch (NullPointerException | IllegalStateException exception)
+                {
+                    Log.e("weatherRtrver.connect()",exception.getMessage());
+                }
+
+                getContext().unregisterReceiver(wifiReceiver);
+            }
+        }
+    };
+
+
 
 
 
@@ -86,6 +114,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         scrollView = (ScrollView) view.findViewById(R.id.scrollView);
         background_image=(ImageView)view.findViewById(R.id.background_image);
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        refreshButton=(ImageButton)view.findViewById(R.id.refreshButton);
         currentStatus = (TextView) view.findViewById(R.id.condition_textview);
         tmp = (TextView) view.findViewById(R.id.temp_textview);
         imageStatus = (ImageView) view.findViewById(R.id.weather_imageview);
@@ -147,7 +176,17 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
             }
         });
 
-        hideViews();
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                IntentFilter intentFilter=new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+                getContext().registerReceiver(wifiReceiver,intentFilter);
+                ((MainActivity)getActivity()).checkWifi();
+
+            }
+        });
+
+        //hideViews();
 
 
        return view;
@@ -157,15 +196,14 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
     public void onResume()
     {
         super.onResume();
-        try
-        {
+
+        try {
             weatherRetriever.connect();
         }
         catch (NullPointerException | IllegalStateException exception)
         {
             Log.e("weatherRtrver.connect()",exception.getMessage());
         }
-
     }
 
     @Override
@@ -238,6 +276,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         scrollView.setVisibility(View.GONE);
         imageStatus.setImageResource(R.drawable.na);
         recyclerView.setVisibility(View.GONE);
+        refreshButton.setVisibility(View.VISIBLE);
         recyclerView2.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
        // background_image.setVisibility(View.GONE);
@@ -253,6 +292,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         scrollView.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
+        refreshButton.setVisibility(View.GONE);
 
     }
 
