@@ -18,7 +18,7 @@
         
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.weather.codyhammond.weatherapp.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:configChanges="orientation"

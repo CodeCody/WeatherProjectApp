@@ -1,17 +1,12 @@
-package com.weather.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherapp;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -32,6 +27,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.weather.codyhammond.weatherproject.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +55,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
     private ImageButton navForecast;
     private ImageView background_image;
     private String city;
-    private ImageButton refreshButton;
+    protected ImageButton refreshButton;
     private ForecastAdapter adapter1 = new ForecastAdapter();
     private ForecastAdapter adapter2 = new ForecastAdapter();
     private WeatherRetriever weatherRetriever;
@@ -93,7 +90,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         setRetainInstance(true);
         weatherRetriever=new WeatherRetriever();
         weatherRetriever.setFragmentUIListener(this);
-        background_animation=AnimationUtils.loadAnimation(getContext(),R.anim.background_image_fade);
+        background_animation=AnimationUtils.loadAnimation(getContext(), R.anim.background_image_fade);
         ((MainActivity) getActivity()).getViewPager().addOnPageChangeListener(this);
         drawerListener=(MainActivity)getActivity();
     }

@@ -1,4 +1,4 @@
-package com.weather.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherapp;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,7 +8,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
+
+import com.weather.codyhammond.weatherproject.R;
 
 /**
  * Created by codyhammond on 5/17/16.
@@ -24,6 +27,12 @@ public class WeatherCurrentFragment extends WeatherFragment {
         Drawable drawable=new BitmapDrawable(getResources(),bitmap.createScaledBitmap(bitmap,70,70,false));
         city_name.setCompoundDrawablesWithIntrinsicBounds(drawable,null,null,null);
 
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity)getActivity()).establishConnection();
+            }
+        });
         return view;
     }
 
@@ -31,7 +40,7 @@ public class WeatherCurrentFragment extends WeatherFragment {
     public void onResume()
     {
         super.onResume();
-
+        ((MainActivity)getActivity()).establishConnection();
     }
 
 

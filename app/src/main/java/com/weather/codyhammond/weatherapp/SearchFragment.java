@@ -1,4 +1,4 @@
-package com.weather.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherapp;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,6 +17,8 @@ import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.weather.codyhammond.weatherproject.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +56,8 @@ public class SearchFragment extends Fragment
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             private Timer timer=new Timer();
-            private final int DELAY=400;
+            boolean firstRun=true;
+            private final int DELAY=500;
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -64,12 +67,12 @@ public class SearchFragment extends Fragment
             public boolean onQueryTextChange(final String newText) {
 
                 search_progress.setVisibility(View.VISIBLE);
-                timer.cancel();
-                timer=new Timer();
+
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
                         getResults(newText);
+
                     }
                 },DELAY);
                 return false;
@@ -81,14 +84,12 @@ public class SearchFragment extends Fragment
 
     public void getResults(final String newText)
     {
-
         final RestAdapter adapter=new RestAdapter.Builder().setEndpoint(WeatherFragment.baseURL).build();
         final WeatherInterface locationSuggestions=adapter.create(WeatherInterface.class);
         //public String URL="select location,item,lastBuildDate,astronomy from weather.forecast where woeid in (select woeid from geo.places(1) where text=\"naperville, il\")";
         String query=String.format("select title from weather.forecast where woeid in (select woeid from geo.places where text=\"%s*\") | unique(field=\"title\")",newText);
         StringBuilder search_query=new StringBuilder();
         search_query.append(Uri.encode(query)).append(WeatherFragment.ending);
-
 
         locationSuggestions.getSearchFeed(search_query.toString(), new Callback<searchResponse>() {
             @Override
@@ -106,7 +107,6 @@ public class SearchFragment extends Fragment
                     Log.e("NullPointerException",NPE.getMessage());
 
                 }
-
             }
 
             @Override
@@ -115,7 +115,6 @@ public class SearchFragment extends Fragment
                 WifiManager wifimanager=(WifiManager)getContext().getSystemService(Context.WIFI_SERVICE);
                 if(!wifimanager.isWifiEnabled())
                     Toast.makeText(getActivity(), "Network Unavailable", Toast.LENGTH_SHORT).show();
-
             }
         });
     }
@@ -129,7 +128,6 @@ public class SearchFragment extends Fragment
             super(view);
             view.setOnClickListener(this);
             city=(TextView)view.findViewById(R.id.result_location);
-
         }
 
         @Override
@@ -175,6 +173,7 @@ public class SearchFragment extends Fragment
 
             return new ResultsHolder(view);
         }
+
         @Override
         public void onBindViewHolder(ResultsHolder holder,int pos)
         {

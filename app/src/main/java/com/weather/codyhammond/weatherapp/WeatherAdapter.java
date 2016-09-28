@@ -1,4 +1,4 @@
-package com.weather.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherapp;
 
 import android.app.Activity;
 import android.support.v4.app.Fragment;
@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import com.weather.codyhammond.weatherproject.R;
 
 import java.util.ArrayList;
 import java.util.Iterator;

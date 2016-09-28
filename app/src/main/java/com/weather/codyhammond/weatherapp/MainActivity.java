@@ -1,11 +1,10 @@
-package com.weather.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherapp;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.*;
@@ -39,6 +38,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.*;
+import com.weather.codyhammond.weatherproject.R;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -183,8 +183,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     }
                 }
             };
-
-
         }
         else
         {
@@ -449,8 +447,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 removeLocationUpdates();
                 GoogleClient.disconnect();
             }
-
-//d            getSupportFragmentManager().beginTransaction().add(R.id.activity_main,new SearchFragment()).commit();
         }
         finally {
             adapter.setCurrentLocation(builder.toString());

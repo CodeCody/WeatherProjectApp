@@ -12,11 +12,11 @@ android {
     compileSdkVersion 24
     buildToolsVersion '23.0.3'
     defaultConfig {
-        applicationId "com.codyhammond.weatherproject"
+        applicationId "com.codyhammond.weatherapp"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 3
-        versionName "1.2"
+        versionCode 5
+        versionName "1.4"
     }
     buildTypes {
         release {

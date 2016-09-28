@@ -1,8 +1,10 @@
-package com.weather.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherapp;
 
 import android.net.Uri;
 import android.util.Log;
 
+
+import com.weather.codyhammond.weatherproject.R;
 
 import java.util.ArrayList;
 import java.util.List;

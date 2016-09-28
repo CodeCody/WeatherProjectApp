@@ -1,4 +1,4 @@
-package com.weather.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherapp;
 
 /**
  * Created by codyhammond on 5/19/16.

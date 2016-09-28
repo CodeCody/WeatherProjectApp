@@ -1,4 +1,4 @@
-package com.weather.codyhammond.weatherproject;
+package com.weather.codyhammond.weatherapp;
 
 import android.database.DataSetObserver;
 import android.graphics.Color;
@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ToggleButton;
 
+
+import com.weather.codyhammond.weatherproject.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +60,7 @@ public class EditLocationFragment extends Fragment
             toggle_current_location.setBackgroundColor(getActivity().getResources().getColor(R.color.toggleOff));
         }
         toggle_current_location.setChecked(MainActivity.geo_flag);
+
         toggle_current_location.setOnClickListener(new View.OnClickListener() {
             @SuppressWarnings("Deprecation")
             @Override
@@ -79,7 +82,9 @@ public class EditLocationFragment extends Fragment
                 Log.i("ToggleButton","Clicked");
             }
         });
+
         remove_loc=(Button)view.findViewById(R.id.removal_button);
+
         add_loc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,6 +94,7 @@ public class EditLocationFragment extends Fragment
         });
 
         remove_loc.setVisibility(View.GONE);
+
         remove_loc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,13 +109,11 @@ public class EditLocationFragment extends Fragment
                  }
                 adapter.notifyDataSetChanged();
                 selectionCheck();
-
             }
         });
+
         listView=(ListView)view.findViewById(R.id.remove_listView);
         adapter=((MainActivity)getActivity()).getWeather();
-
-
 
         if(this.getView()!=null)
         {
@@ -198,5 +202,4 @@ public class EditLocationFragment extends Fragment
         }
         remove_loc.setVisibility(View.GONE);
     }
-
 }
