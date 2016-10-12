@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.weather.codyhammond.weatherproject.R;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -36,13 +37,13 @@ import retrofit.client.Response;
 public class SearchFragment extends Fragment
 {
     private SearchView searchView;
-    private List<Channel>places=new ArrayList<>();
+    private List<Channel>places=new LinkedList<>();
     private RecyclerView results;
     private ProgressBar search_progress;
   //  select location,item,lastBuildDate,astronomy from weather.forecast where woeid in (select woeid from geo.places(1) where text=\"naperville, il\")";
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent, final Bundle savedInstanceState)
+    public View onCreateView(LayoutInflater inflater, final ViewGroup parent, final Bundle savedInstanceState)
     {
         View view=inflater.inflate(R.layout.search_layout,parent,false);
         search_progress=(ProgressBar)view.findViewById(R.id.search_progressBar);
@@ -55,9 +56,12 @@ public class SearchFragment extends Fragment
         searchView.setIconified(false);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            private Timer timer=new Timer();
+            private Timer timer=null;//=new Timer();
             boolean firstRun=true;
             private final int DELAY=500;
+
+
+
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -66,16 +70,34 @@ public class SearchFragment extends Fragment
             @Override
             public boolean onQueryTextChange(final String newText) {
 
-                search_progress.setVisibility(View.VISIBLE);
+                if(newText.length()==0) {
+                    search_progress.setVisibility(View.GONE);
+                    places.clear();
+                    results.getAdapter().notifyDataSetChanged();
+                    return false;
+                }
 
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        getResults(newText);
-
+                try {
+                    if (timer != null) {
+                        timer.cancel();
+                        timer = new Timer();
                     }
-                },DELAY);
-                return false;
+                    else
+                        timer = new Timer();
+
+                    search_progress.setVisibility(View.VISIBLE);
+
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            getResults(newText);
+                        }
+                    }, DELAY);
+                }
+                finally {
+                    return false;
+                }
+
             }
         });
 
@@ -112,9 +134,15 @@ public class SearchFragment extends Fragment
             @Override
             public void failure(RetrofitError error) {
                 Log.i("Response","Failure");
-                WifiManager wifimanager=(WifiManager)getContext().getSystemService(Context.WIFI_SERVICE);
-                if(!wifimanager.isWifiEnabled())
-                    Toast.makeText(getActivity(), "Network Unavailable", Toast.LENGTH_SHORT).show();
+                try {
+                    WifiManager wifimanager = (WifiManager) getContext().getSystemService(Context.WIFI_SERVICE);
+                    if (!wifimanager.isWifiEnabled())
+                        Toast.makeText(getActivity(), "Network Unavailable", Toast.LENGTH_SHORT).show();
+                }
+                catch (NullPointerException NPE)
+                {
+                    Log.e("searchFragment",NPE.getMessage());
+                }
             }
         });
     }

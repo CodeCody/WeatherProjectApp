@@ -16,6 +16,7 @@ import com.weather.codyhammond.weatherproject.R;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -33,8 +34,8 @@ public class WeatherAdapter extends FragmentStatePagerAdapter {
     public WeatherAdapter(FragmentManager fm, Activity activity) {
         super(fm);
         this.activity=activity;
-        fragmentList = new ArrayList<>();
-        locations = new ArrayList<>();
+        fragmentList = new LinkedList<>();
+        locations = new LinkedList<>();
         locationAdapter = new LocationAdapter(R.layout.navigation_items);
         removalAdapter=new RemovalAdapter(R.layout.location_removal_items);
     }
@@ -59,7 +60,7 @@ public class WeatherAdapter extends FragmentStatePagerAdapter {
             notifyDataSetChanged();
         }
     }
-    public void setCurrentLocation(String city)
+    public synchronized void setCurrentLocation(String city)
     {
 
         if(fragmentList.size()==0)
@@ -73,6 +74,7 @@ public class WeatherAdapter extends FragmentStatePagerAdapter {
         if(fragmentList.get(0) instanceof WeatherCurrentFragment)
         {
             fragmentList.set(0,WeatherCurrentFragment.newFragment(city));
+            notifyDataSetChanged();
         }
         else
         {

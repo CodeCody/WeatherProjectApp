@@ -2,6 +2,7 @@ package com.weather.codyhammond.weatherapp;
 
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 
 import com.weather.codyhammond.weatherproject.R;
@@ -65,10 +66,12 @@ public class WeatherRetriever
         }
         if(query.length()==0)
         {
+            FragmentUI.updateUIOnFailure();
             throw new IllegalStateException("No query set,call WeatherRetriever.setQuery(String)");
         }
         if(weather_location==null || weather_location.length()==0)
         {
+            FragmentUI.updateUIOnFailure();
             throw new IllegalStateException("No location set");
         }
         if(FragmentUI==null)
@@ -287,6 +290,7 @@ public class WeatherRetriever
             catch (NullPointerException NPE)
             {
                 Log.e("getting values",NPE.getMessage());
+
                 FragmentUI.updateUIOnFailure();
             }
 

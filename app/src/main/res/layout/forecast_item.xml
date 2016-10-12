@@ -25,6 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/day"
+        style="@style/AudioFileInfoOverlayText"
         android:paddingLeft="5dp"
         android:gravity="center_vertical"
         android:textColor="#ffffff" />
@@ -58,15 +59,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/high"
+        style="@style/AudioFileInfoOverlayText"
         android:textColor="#ffffff" />
       <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+          style="@style/AudioFileInfoOverlayText"
         android:text=" - " />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/low"
+        style="@style/AudioFileInfoOverlayText"
         android:textColor="#8fc9fb"/>
 
         </LinearLayout>

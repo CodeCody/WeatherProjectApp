@@ -30,6 +30,8 @@ import android.widget.Toast;
 
 import com.weather.codyhammond.weatherproject.R;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,29 +58,11 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
     private ImageView background_image;
     private String city;
     protected ImageButton refreshButton;
+    private final int CITY_MAX_LENGTH=17;
     private ForecastAdapter adapter1 = new ForecastAdapter();
     private ForecastAdapter adapter2 = new ForecastAdapter();
     private WeatherRetriever weatherRetriever;
     private Animation background_animation;
-    private BroadcastReceiver wifiReceiver=new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-            if (info != null && info.isConnectedOrConnecting()) {
-                Toast.makeText(getActivity(), "Wifi Enabled. Trying to connect...", Toast.LENGTH_SHORT).show();
-                try {
-                    weatherRetriever.connect();
-                }
-                catch (NullPointerException | IllegalStateException exception)
-                {
-                    Log.e("weatherRtrver.connect()",exception.getMessage());
-                }
-
-                getContext().unregisterReceiver(wifiReceiver);
-            }
-        }
-    };
-
 
 
 
@@ -136,6 +120,8 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
 
         recyclerView2.setVisibility(View.GONE);
 
+
+
         five_day.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -176,8 +162,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                IntentFilter intentFilter=new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-                getContext().registerReceiver(wifiReceiver,intentFilter);
+
                 ((MainActivity)getActivity()).checkWifi();
 
             }
@@ -258,7 +243,10 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         if(getView()==null)
             return;
 
-        location.setText(R.string.not_available);
+        Toast.makeText(getContext(),"Failed to connect. Check internet connection.",Toast.LENGTH_LONG).show();
+
+        setLocationTextViewSettingsOnFailure();
+
         hideViews();
 
     }
@@ -311,7 +299,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
             return;
 
         showViews();
-        location.setText(weatherRetriever.getLocation());
+        setLocationTextViewSettingsOnSuccess(weatherRetriever.getLocation());
         SunriseText.setText(weatherRetriever.getSunrise());
         SunsetText.setText(weatherRetriever.getSunset());
         currentStatus.setText(weatherRetriever.getCondition());
@@ -324,6 +312,25 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         progressBar.setVisibility(View.GONE);
         background_image.setImageResource(weatherRetriever.getWeatherBackground());
         background_image.startAnimation(background_animation);
+    }
+
+    public void setLocationTextViewSettingsOnFailure()
+    {
+        location.setMaxLines(2);
+        location.setWidth(600);
+        location.setText(R.string.not_available);
+    }
+
+    public void setLocationTextViewSettingsOnSuccess(String locationName)
+    {
+        if(locationName.length() > CITY_MAX_LENGTH)
+        {
+            location.setWidth(600);
+            location.setMaxLines(1);
+            //location.setEllipsize();
+        }
+
+        location.setText(locationName);
     }
 
     public void closeDrawer()

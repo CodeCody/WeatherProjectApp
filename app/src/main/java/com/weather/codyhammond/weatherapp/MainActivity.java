@@ -1,14 +1,17 @@
 package com.weather.codyhammond.weatherapp;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.*;
 import android.location.Location;
+import android.location.LocationListener;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -37,6 +40,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.*;
 import com.weather.codyhammond.weatherproject.R;
 
@@ -60,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private Button edit_loc;
-    private static String locationPref="LocationOption";
+    private static final String locationPref="LocationOption";
     public static boolean geo_flag=true;
     private boolean wifi_flag=false;
     private SharedPreferences sharedPreferences;
@@ -72,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.base_display);
+        initWifiReceiver();
         checkWifi();
         sharedPreferences=getPreferences(MODE_PRIVATE);
         geo_flag=sharedPreferences.getBoolean(locationPref,false);
@@ -141,11 +147,38 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 .addApi(LocationServices.API)
                 .build();
 
+        GoogleClient.connect();
+
 
         adapter.setLocations(readLocationsFromFile());
 
         CurrentLocLabelOnOrOff();
 
+    }
+
+    public void initWifiReceiver()
+    {
+        wifiReceiver=new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                final NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                if (info != null && info.isConnectedOrConnecting()) {
+                    Toast.makeText(MainActivity.this, "Wifi Enabled. Trying to connect...", Toast.LENGTH_SHORT).show();
+
+                    if(geo_flag) {
+                        GoogleClient.connect();
+                    }
+                    else
+                    {
+                        viewPager.setAdapter(adapter);
+                    }
+
+                }
+            }
+        };
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        registerReceiver(wifiReceiver, intentFilter);
     }
 
     public ViewPager getViewPager() {
@@ -161,28 +194,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void establishConnection()
     {
+        if(!GoogleClient.isConnectionCallbacksRegistered(this))
+        {
+            GoogleClient.registerConnectionCallbacks(this);
+            GoogleClient.registerConnectionFailedListener(this);
+        }
         ConnectivityManager manager=(ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo info=manager.getActiveNetworkInfo();
-        if(wifi_flag && geo_flag && info !=null) {
-            GoogleClient.connect();
-        }
-        else if(geo_flag || !wifi_flag)
+        if(info==null)
         {
-            wifiReceiver=new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    final NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-                    if (info != null && info.isConnectedOrConnecting()) {
-                        Toast.makeText(MainActivity.this, "Wifi Enabled. Trying to connect...", Toast.LENGTH_SHORT).show();
-
-                        if(geo_flag) {
-                            GoogleClient.connect();
-                        }
-
-                        unregisterReceiver(wifiReceiver);
-                    }
-                }
-            };
+            Toast.makeText(this,"No access to internet. Please check connection.",Toast.LENGTH_LONG).show();
+            return;
+        }
+        if(wifi_flag && geo_flag ) {
+            GoogleClient.connect();
+            Toast.makeText(MainActivity.this, "Trying to connect...", Toast.LENGTH_SHORT).show();
         }
         else
         {
@@ -274,9 +300,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         {
 //            current_loc_container.setVisibility(View.VISIBLE);
             GoogleClient.registerConnectionCallbacks(this);
-            GoogleClient.connect();
             currentFlag=false;
             geo_flag=true;
+            GoogleClient.connect();
+
             CurrentLocLabelOnOrOff();
         }
     }
@@ -378,7 +405,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     {
         super.onDestroy();
         sharedPreferences=getPreferences(MODE_PRIVATE);
-     //   unregisterReceiver(wifiReceiver);
+        unregisterReceiver(wifiReceiver);
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putBoolean(locationPref,geo_flag).apply();
         writeLocationsToFile();
@@ -392,14 +419,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private void startLocationUpdates()
     {
-        if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED)
+        if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
         {
-            LocationRequest locationRequest=LocationRequest.create().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(3000);
-            LocationServices.FusedLocationApi.requestLocationUpdates(
-                    GoogleClient, locationRequest, this);
+            LocationRequest locationRequest=LocationRequest.create().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+            LocationServices.FusedLocationApi.requestLocationUpdates(GoogleClient, locationRequest,this);
         }
-
     }
+
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult result)
     {
@@ -418,9 +444,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         StringBuilder builder=new StringBuilder();
 
+        if(GoogleClient.isConnected()) {
+            removeLocationUpdates();
+            GoogleClient.unregisterConnectionCallbacks(this);
+            GoogleClient.disconnect();
+        }
+
+
+
         try {
-            if(currentFlag)
-                return;
             currentFlag=true;
             Geocoder geo = new Geocoder(getApplicationContext(), Locale.getDefault());
             List<Address> areas = geo.getFromLocation(changedlocation.getLatitude(), changedlocation.getLongitude(), 0);
@@ -428,36 +460,43 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 builder.append(areas.get(0).getLocality());
                 builder.append(",").append(areas.get(0).getAdminArea());
 
-               // viewPager.addView(new WeatherCurrentFragment().getView(),0);
 
             }
-            if(GoogleClient.isConnected()) {
-                GoogleClient.unregisterConnectionCallbacks(this);
-                removeLocationUpdates();
-                GoogleClient.disconnect();
-            }
+
         } catch (Exception e) {
 
             builder.append(R.string.current_location_not_available);
             viewPager.removeAllViews();
             Log.e("onLocationChanged",e.getMessage());
             e.printStackTrace();
-            if(GoogleClient.isConnected()) {
-                GoogleClient.unregisterConnectionCallbacks(this);
-                removeLocationUpdates();
-                GoogleClient.disconnect();
-            }
         }
         finally {
+
             adapter.setCurrentLocation(builder.toString());
             viewPager.setAdapter(adapter);
         }
+
     }
 
     public void removeLocationUpdates()
     {
-        LocationServices.FusedLocationApi.removeLocationUpdates(
-                GoogleClient, this);
+        try {
+           // PendingIntent pendingIntent=new PendingIntent();
+          PendingResult<Status> result = LocationServices.FusedLocationApi.removeLocationUpdates(GoogleClient,this);
+            result.cancel();
+
+            if(result.isCanceled())
+            {
+                Log.i("Test","yes");
+            }
+            else
+            {
+                Log.i("Test","no");
+            }
+            GoogleClient.disconnect();
+
+        }
+        catch (IllegalStateException ise){}
     }
 
     @Override

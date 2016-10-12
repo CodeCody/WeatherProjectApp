@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/background_image"
-            android:scaleType="fitXY"/>
+            android:scaleType="centerCrop"/>
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -83,9 +83,9 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="-"
-        android:maxWidth="300dp"
         android:ellipsize="end"
         style="@style/AudioFileInfoOverlayText"
         android:id="@+id/city_name"
@@ -123,6 +123,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            style="@style/AudioFileInfoOverlayText"
             android:paddingStart="5dp"
             android:paddingLeft="5dp"
             android:text="Forecast"

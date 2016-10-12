@@ -65,6 +65,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/sunrise_label"
         android:text="@string/sunrise"
+        style="@style/AudioFileInfoOverlayText"
         android:paddingRight="5dp"
         android:textColor="#ffffff" />
 
@@ -74,6 +75,7 @@
         android:id="@+id/sunrise_time"
         android:paddingStart="0dp"
         android:paddingLeft="0dp"
+        style="@style/AudioFileInfoOverlayText"
         android:paddingEnd="10dp"
         android:paddingRight="10dp"
         android:textColor="#ffffff" />
@@ -83,6 +85,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/sunset_label"
         android:text="@string/sunset"
+        style="@style/AudioFileInfoOverlayText"
         android:paddingRight="5dp"
         android:textColor="#ffffff" />
 
@@ -90,6 +93,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/sunset_time"
+        style="@style/AudioFileInfoOverlayText"
         android:textColor="#ffffff" />
 </LinearLayout>
     </LinearLayout>
