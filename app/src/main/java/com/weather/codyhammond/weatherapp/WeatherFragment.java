@@ -163,7 +163,8 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
             @Override
             public void onClick(View view) {
 
-                ((MainActivity)getActivity()).checkWifi();
+                ((MainActivity)getActivity()).establishConnection();
+                Log.i("refreshButton","click");
 
             }
         });
@@ -243,7 +244,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
         if(getView()==null)
             return;
 
-        Toast.makeText(getContext(),"Failed to connect. Check internet connection.",Toast.LENGTH_LONG).show();
+       // Toast.makeText(getContext(),"Failed to connect. Check internet connection.",Toast.LENGTH_LONG).show();
 
         setLocationTextViewSettingsOnFailure();
 
@@ -325,7 +326,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
     {
         if(locationName.length() > CITY_MAX_LENGTH)
         {
-            location.setWidth(600);
+            location.setWidth(700);
             location.setMaxLines(1);
             //location.setEllipsize();
         }

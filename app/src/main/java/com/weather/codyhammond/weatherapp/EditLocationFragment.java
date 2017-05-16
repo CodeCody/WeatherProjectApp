@@ -1,10 +1,12 @@
 package com.weather.codyhammond.weatherapp;
 
+import android.content.pm.PackageManager;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -20,6 +22,7 @@ import com.weather.codyhammond.weatherproject.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.Manifest;
 
 /**
  * Created by codyhammond on 5/11/16.
@@ -33,6 +36,7 @@ public class EditLocationFragment extends Fragment
     private DataSetObserver dataSetObserver;
     private ToggleButton toggle_current_location;
     private LocationToggleListener locationToggleListener;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -49,12 +53,12 @@ public class EditLocationFragment extends Fragment
         selected_list=new ArrayList<>();
         add_loc=(Button)view.findViewById(R.id.add_loc);
         toggle_current_location=(ToggleButton)view.findViewById(R.id.toggle_button);
-        if(MainActivity.geo_flag)
+        if(MainActivity.geo_flag && ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED)
         {
             toggle_current_location.setChecked(MainActivity.geo_flag);
             toggle_current_location.setBackgroundColor(getActivity().getResources().getColor(R.color.toggleOn));
         }
-        else
+        else if(!MainActivity.geo_flag )
         {
             toggle_current_location.setChecked(MainActivity.geo_flag);
             toggle_current_location.setBackgroundColor(getActivity().getResources().getColor(R.color.toggleOff));

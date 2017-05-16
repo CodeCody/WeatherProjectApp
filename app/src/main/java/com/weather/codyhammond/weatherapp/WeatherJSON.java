@@ -82,21 +82,41 @@ class Forecast
 {
  "query": {
   "count": 1,
-  "created": "2016-04-08T00:29:31Z",
+  "created": "2017-02-03T21:13:59Z",
   "lang": "en-US",
   "results": {
    "channel": {
-    "item": {
-     "title": "Conditions for Chicago, IL, US at 06:00 PM CDT",
-     "lat": "41.884151",
-     "long": "-87.632408",
-     "link": "http://us.rd.yahoo.com/dailynews/rss/weather/Country__Country/*https://weather.yahoo.com/country/state/city-2379574/",
-     "pubDate": "Thu, 07 Apr 2016 06:00 PM CDT",
-     "condition": {
-      "code": "26",
-      "date": "Thu, 07 Apr 2016 06:00 PM CDT",
-      "temp": "40",
-      "text": "Cloudy"
-     },
+    "units": {
+     "distance": "mi",
+     "pressure": "in",
+     "speed": "mph",
+     "temperature": "F"
+    },
+    "title": "Yahoo! Weather - Naperville, IL, US",
+    "link": "http://us.rd.yahoo.com/dailynews/rss/weather/Country__Country/*https://weather.yahoo.com/country/state/city-2457000/",
+    "description": "Yahoo! Weather for Naperville, IL, US",
+    "language": "en-us",
+    "lastBuildDate": "Fri, 03 Feb 2017 03:13 PM CST",
+    "ttl": "60",
+    "location": {
+     "city": "Naperville",
+     "country": "United States",
+     "region": " IL"
+    },
+    "wind": {
+     "chill": "18",
+     "direction": "300",
+     "speed": "18"
+    },
+    "atmosphere": {
+     "humidity": "36",
+     "pressure": "1004.0",
+     "rising": "0",
+     "visibility": "16.1"
+    },
+    "astronomy": {
+     "sunrise": "7:3 am",
+     "sunset": "5:10 pm"
+    },
 
  */

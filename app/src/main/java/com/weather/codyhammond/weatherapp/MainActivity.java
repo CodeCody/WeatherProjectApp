@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.*;
@@ -14,8 +15,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
@@ -41,6 +44,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.*;
 import com.weather.codyhammond.weatherproject.R;
@@ -70,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private boolean wifi_flag=false;
     private SharedPreferences sharedPreferences;
     private TextView currentLocation;
+    private final String TAG="LocationTag";
     private ImageView currentLocationImage;
     private BroadcastReceiver wifiReceiver;
 
@@ -232,8 +237,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void checkWifi()
     {
-      WifiManager wifiManager=(WifiManager)getSystemService(Context.WIFI_SERVICE);
-        ConnectivityManager connectivityManager=(ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+      WifiManager wifiManager=(WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+       // ConnectivityManager connectivityManager
+        //=(ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         if(wifiManager.isWifiEnabled())
         {
@@ -257,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                 if(which == DialogInterface.BUTTON_POSITIVE)
                 {
-                    WifiManager wifiManager=(WifiManager)getSystemService(WIFI_SERVICE);
+                    WifiManager wifiManager=(WifiManager)getApplicationContext().getSystemService(WIFI_SERVICE);
                     wifiManager.setWifiEnabled(true);
                     Toast.makeText(MainActivity.this, "Enabling Wifi..", Toast.LENGTH_SHORT).show();
                 }
@@ -414,15 +420,45 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onConnected(Bundle bundle)
     {
-        startLocationUpdates();
+        checkLocationUpdates();
     }
 
-    private void startLocationUpdates()
+    private void checkLocationUpdates()
     {
+        LocationRequest locationRequest;
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
         {
-            LocationRequest locationRequest=LocationRequest.create().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+            locationRequest=LocationRequest.create().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
             LocationServices.FusedLocationApi.requestLocationUpdates(GoogleClient, locationRequest,this);
+
+        }
+        else {
+            AlertDialog.Builder locationDialog=new AlertDialog.Builder(this);
+            locationDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    final Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    intent.addCategory(Intent.CATEGORY_DEFAULT);
+                    intent.setData(Uri.parse("package:" + getPackageName()));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                    startActivity(intent);
+                }
+            });
+
+            locationDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finish();
+                }
+            });
+
+            locationDialog.setTitle("Allow this app to enable GPS tracking?");
+            //locationDialog.
+            locationDialog.create().show();
+
         }
     }
 
@@ -430,7 +466,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onConnectionFailed(@NonNull ConnectionResult result)
     {
       //getSupportFragmentManager().beginTransaction().replace(R.id.drawer,new NoConnectionFragment()).commit();
-        Log.i("onConnectionFailed",result.getErrorMessage());
+        if(result.getErrorMessage()==null) {
+            Log.i("onConnectionFailed", "error message is null");
+        }
+        else {
+            Log.i("onConnectionFailed",result.getErrorMessage());
+        }
     }
 
     @Override
