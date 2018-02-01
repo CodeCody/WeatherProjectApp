@@ -496,7 +496,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         try {
             currentFlag=true;
             Geocoder geo = new Geocoder(getApplicationContext(), Locale.getDefault());
-            List<Address> areas = geo.getFromLocation(changedlocation.getLatitude(), changedlocation.getLongitude(), 0);
+            List<Address> areas = geo.getFromLocation(changedlocation.getLatitude(), changedlocation.getLongitude(), 1);
             if (!areas.isEmpty()) {
                 builder.append(areas.get(0).getLocality());
                 builder.append(",").append(areas.get(0).getAdminArea());
