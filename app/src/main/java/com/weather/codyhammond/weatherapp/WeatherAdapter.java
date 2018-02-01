@@ -180,7 +180,7 @@ public class WeatherAdapter extends FragmentStatePagerAdapter {
             }
             else
             {
-                imageView.setImageResource(R.drawable.ic_clear_white);
+                imageView.setImageResource(R.drawable.ic_clear_white_24dp);
             }
             textView.setText(locations.get(position));
 

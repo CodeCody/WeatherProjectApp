@@ -165,6 +165,7 @@ public class WeatherFragment extends Fragment implements ViewPager.OnPageChangeL
 
                 ((MainActivity)getActivity()).establishConnection();
                 Log.i("refreshButton","click");
+                location.invalidate();
 
             }
         });
